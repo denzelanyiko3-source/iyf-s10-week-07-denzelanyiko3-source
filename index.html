@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>My Notes</h1>
+            <p class="subtitle">Note down anything...feel free.</p>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Total Notes:</span>
+                <span class="stat-value" id="noteCount">0</span>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <input
+                type="text"
+                id="noteTitle"
+                class="note-input"
+                placeholder="Note title..."
+            >
+            <textarea
+                id="noteBody"
+                class="note-textarea"
+                placeholder="Type your note here..."
+            ></textarea>
+            <button id="addNoteBtn" class="btn btn-primary">Save Note</button>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <input
+                type="text"
+                id="searchInput"
+                class="search-input"
+                placeholder="Search notes..."
+            >
+        </div>
+
+        <!-- Notes Grid -->
+        <div class="notes-grid" id="notesGrid">
+            <!-- Notes will be added here by JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <p> No notes yet</p>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

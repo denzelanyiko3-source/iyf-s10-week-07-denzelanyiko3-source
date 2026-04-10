@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auto Save Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f5f5f5;
+    }
+    .form-container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    input, textarea {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h3>Contact Form</h3>
+    <form id="myForm">
+      <input type="text" id="name" placeholder="Name" />
+      <input type="email" id="email" placeholder="Email" />
+      <textarea id="message" placeholder="Message"></textarea>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('myForm');
+    const fields = ['name', 'email', 'message'];
+
+    // Load saved data
+    window.addEventListener('DOMContentLoaded', () => {
+      fields.forEach(field => {
+        const savedValue = sessionStorage.getItem(field);
+        if (savedValue) {
+          document.getElementById(field).value = savedValue;
+        }
+      });
+    });
+
+    // Save on input
+    fields.forEach(field => {
+      document.getElementById(field).addEventListener('input', (e) => {
+        sessionStorage.setItem(field, e.target.value);
+      });
+    });
+
+    // Clear on submit
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      fields.forEach(field => sessionStorage.removeItem(field));
+      alert('Form submitted and session cleared!');
+      form.reset();
+    });
+  </script>
+</body>
+</html>

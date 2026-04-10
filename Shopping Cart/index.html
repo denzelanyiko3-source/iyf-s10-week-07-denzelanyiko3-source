@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Cart</title>
+  <style>
+    body { font-family: Arial; margin: 0; background: #f5f5f5; }
+    header { background: #222; color: white; padding: 15px; display: flex; justify-content: space-between; }
+    h3 { margin: 0; font-family: 'Courier New', Courier, monospace; }
+    .container { display: flex; padding: 20px; gap: 20px; }
+    .products { flex: 2; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 15px; }
+    .product { background: white; padding: 10px; border-radius: 10px; }
+    .product img { width: 100%; border-radius: 10px; }
+    .cart { flex: 1; background: white; padding: 15px; border-radius: 10px; }
+    button { padding: 8px; border: none; background: #4CAF50; color: white; cursor: pointer; border-radius: 5px; }
+    .qty-btn { padding: 3px 6px; margin: 0 3px; }
+    footer { text-align: center; padding: 10px; background: #222; color: white; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>Shop</h2>
+  <div>Cart (<span id="cart-count">0</span>)</div>
+</header>
+
+<div class="container">
+  <div class="products" id="products"></div>
+
+  <div class="cart">
+    <h3>Cart</h3>
+    <div id="cart-items"></div>
+    <h4>Total: $<span id="total">0</span></h4>
+    <button onclick="clearCart()">Clear Cart</button>
+  </div>
+</div>
+
+<script>
+// PRODUCTS
+const products = [
+  { id: 1, name: "Sneakers", price: 1500, image: "Screenshot (42).png" },
+  { id: 2, name: "Headphones", price: 1000, image: "Screenshot (43).png" },
+  { id: 3, name: "Watch", price: 1500, image: "Screenshot (44).png" },
+  { id: 4, name: "Backpack", price: 1000, image: "Screenshot (45).png" }
+];
+
+// STATE
+let state = {
+  cart: JSON.parse(localStorage.getItem('cart')) || []
+};
+
+// SAVE STATE
+function saveState() {
+  localStorage.setItem('cart', JSON.stringify(state.cart));
+}
+
+// RENDER PRODUCTS
+function renderProducts() {
+  const container = document.getElementById('products');
+  container.innerHTML = '';
+
+  products.forEach(p => {
+    container.innerHTML += `
+      <div class="product">
+        <img src="${p.image}" />
+        <h4>${p.name}</h4>
+        <p>ksh.${p.price}</p>
+        <button onclick="addToCart(${p.id})">Add to Cart</button>
+      </div>
+    `;
+  });
+}
+
+// ADD TO CART
+function addToCart(id) {
+  const item = state.cart.find(i => i.id === id);
+  if (item) {
+    item.qty++;
+  } else {
+    state.cart.push({ id, qty: 1 });
+  }
+  saveState();
+  renderCart();
+}
+
+// REMOVE ITEM
+function removeItem(id) {
+  state.cart = state.cart.filter(i => i.id !== id);
+  saveState();
+  renderCart();
+}
+
+// CHANGE QTY
+function changeQty(id, delta) {
+  const item = state.cart.find(i => i.id === id);
+  if (!item) return;
+
+  item.qty += delta;
+  if (item.qty <= 0) removeItem(id);
+
+  saveState();
+  renderCart();
+}
+
+// CLEAR CART
+function clearCart() {
+  state.cart = [];
+  saveState();
+  renderCart();
+}
+
+// RENDER CART
+function renderCart() {
+  const container = document.getElementById('cart-items');
+  const count = document.getElementById('cart-count');
+  const totalEl = document.getElementById('total');
+
+  container.innerHTML = '';
+
+  let total = 0;
+  let itemCount = 0;
+
+  state.cart.forEach(item => {
+    const product = products.find(p => p.id === item.id);
+    const subtotal = product.price * item.qty;
+
+    total += subtotal;
+    itemCount += item.qty;
+
+    container.innerHTML += `
+      <div>
+        <strong>${product.name}</strong><br>
+        ksh.${product.price} x ${item.qty}
+        <div>
+          <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+          <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+          <button onclick="removeItem(${item.id})">Remove</button>
+        </div>
+      </div>
+      <hr/>
+    `;
+  });
+
+  totalEl.textContent = total;
+  count.textContent = itemCount;
+}
+
+// INIT
+renderProducts();
+renderCart();
+</script>
+<footer>
+  <p>&copy; 2026 My Shop. All rights reserved.by Denzel Anyiko</p>
+</footer>
+</body>
+</html>
