@@ -1,38 +1,35 @@
-# Week {Number}: {Project Title}
+# Week 07: JavaScript Best Practices
 
 ## Author
-- **Name:** Your Full Name
-- **GitHub:** [@MaisoriKitayama](https://github.com/MaisoriKitayama)
-- **Date:** Month Day, Year
+- **Name:** Denzel Anyiko
+- **GitHub:** [@denzelanyiko3-source](https://github.com/denzelanyiko3-source)
+- **Date:** April 10,2026 
 
 ## Project Description
-Brief description of what you built and why.
+Improve your JavaScript projects by applying professional coding practices, managing application state, and persisting data with browser storage. This week focuses on writing cleaner, more maintainable code.
 
 ## Technologies Used
 - HTML5
 - CSS3
 - JavaScript
-- (list all technologies)
+- Markdown
 
 ## Features
-- Feature 1
-- Feature 2
-- Feature 3
+- Refactored To-Do List with localStorage persistence
+- Completed Lesson 13 exercises (localStorage, sessionStorage, state persistence)
+- Completed Lesson 14 exercises (code quality, refactoring, best-practice patterns)
+- Updated project ready for code review (clear structure + readable code)
 
 ## How to Run
 1. Clone this repository
 2. Open `index.html` in your browser
-   OR
-   Run `npm install` then `npm start`
+  
 
 ## Lessons Learned
-What did you learn while building this project?
+- how to upload images using markdown
+
 
 ## Challenges Faced
-What problems did you encounter and how did you solve them?
+- I struggled with debugging but i have found someway of understanding it
 
-## Screenshots (optional)
-![Screenshot description](path/to/screenshot.png)
 
-## Live Demo (if deployed)
-[View Live Demo](https://your-deployed-url.com)

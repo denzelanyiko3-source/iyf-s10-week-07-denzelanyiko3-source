@@ -1,112 +1,197 @@
-// PRODUCTS
+// Constants
+const IMAGE_FALLBACK_URL = 'https://via.placeholder.com/200?text=No+Image';
+const INITIAL_CART_QUANTITY = 1;
+const MIN_CART_QUANTITY = 0;
+const QUANTITY_INCREMENT = 1;
+const QUANTITY_DECREMENT = -1;
+const INITIAL_SUMMARY_TOTAL = 0;
+const INITIAL_SUMMARY_ITEM_COUNT = 0;
+
+// Product prices
+const PRICE_SNEAKERS = 1500;
+const PRICE_HEADPHONES = 1000;
+const PRICE_WATCH = 1500;
+const PRICE_BACKPACK = 1000;
+
 const products = [
-  { id: 1, name: "Sneakers", price: 50, image: "https://via.placeholder.com/200" },
-  { id: 2, name: "Headphones", price: 80, image: "https://via.placeholder.com/200" },
-  { id: 3, name: "Watch", price: 120, image: "https://via.placeholder.com/200" },
-  { id: 4, name: "Backpack", price: 40, image: "https://via.placeholder.com/200" }
+  { id: 1, name: 'Sneakers', price: PRICE_SNEAKERS, image: 'Screenshot (42).png' },
+  { id: 2, name: 'Headphones', price: PRICE_HEADPHONES, image: 'Screenshot (43).png' },
+  { id: 3, name: 'Watch', price: PRICE_WATCH, image: 'Screenshot (44).png' },
+  { id: 4, name: 'Backpack', price: PRICE_BACKPACK, image: 'Screenshot (45).png' }
 ];
 
-// STATE
-let state = {
-  cart: JSON.parse(localStorage.getItem('cart')) || []
+const productsContainer = document.getElementById('products');
+const cartItemsContainer = document.getElementById('cart-items');
+const cartCountElement = document.getElementById('cart-count');
+const cartTotalElement = document.getElementById('total');
+
+const appState = {
+  cartItems: loadCartItems()
 };
 
-// SAVE STATE
-function saveState() {
-  localStorage.setItem('cart', JSON.stringify(state.cart));
+function loadCartItems() {
+  const storedCart = localStorage.getItem('cart');
+  return storedCart ? JSON.parse(storedCart) : [];
 }
 
-// RENDER PRODUCTS
-function renderProducts() {
-  const container = document.getElementById('products');
-  container.innerHTML = '';
-
-  products.forEach(p => {
-    container.innerHTML += `
-      <div class="product">
-        <img src="${p.image}" />
-        <h4>${p.name}</h4>
-        <p>$${p.price}</p>
-        <button onclick="addToCart(${p.id})">Add to Cart</button>
-      </div>
-    `;
-  });
+function persistCartItems() {
+  localStorage.setItem('cart', JSON.stringify(appState.cartItems));
 }
 
-// ADD TO CART
-function addToCart(id) {
-  const item = state.cart.find(i => i.id === id);
-  if (item) {
-    item.qty++;
+function findProduct(productId) {
+  return products.find(product => product.id === productId);
+}
+
+function findCartItem(productId) {
+  return appState.cartItems.find(item => item.id === productId);
+}
+
+// eslint-disable-next-line no-unused-vars
+function addToCart(productId) {
+   
+  const cartItem = findCartItem(productId);
+  if (cartItem) {
+    cartItem.qty += QUANTITY_INCREMENT;
   } else {
-    state.cart.push({ id, qty: 1 });
+    appState.cartItems.push({ id: productId, qty: INITIAL_CART_QUANTITY });
   }
-  saveState();
+
+  persistCartItems();
   renderCart();
 }
 
-// REMOVE ITEM
-function removeItem(id) {
-  state.cart = state.cart.filter(i => i.id !== id);
-  saveState();
+function removeCartItem(productId) {
+  appState.cartItems = appState.cartItems.filter(item => item.id !== productId);
+  persistCartItems();
   renderCart();
 }
 
-// CHANGE QTY
-function changeQty(id, delta) {
-  const item = state.cart.find(i => i.id === id);
-  if (!item) return;
+// eslint-disable-next-line no-unused-vars
+function updateCartItemQuantity(productId, delta) {
+  const cartItem = findCartItem(productId);
+  if (!cartItem) return;
 
-  item.qty += delta;
-  if (item.qty <= 0) removeItem(id);
+  cartItem.qty += delta;
+  if (cartItem.qty <= MIN_CART_QUANTITY) {
+    removeCartItem(productId);
+    return;
+  }
 
-  saveState();
+  persistCartItems();
   renderCart();
 }
 
-// CLEAR CART
+// eslint-disable-next-line no-unused-vars
 function clearCart() {
-  state.cart = [];
-  saveState();
+  appState.cartItems = [];
+  persistCartItems();
   renderCart();
 }
 
-// RENDER CART
-function renderCart() {
-  const container = document.getElementById('cart-items');
-  const count = document.getElementById('cart-count');
-  const totalEl = document.getElementById('total');
+function calculateCartSummary() {
+  return appState.cartItems.reduce(
+    (summary, cartItem) => {
+      const product = findProduct(cartItem.id);
+      if (!product) return summary;
 
-  container.innerHTML = '';
-
-  let total = 0;
-  let itemCount = 0;
-
-  state.cart.forEach(item => {
-    const product = products.find(p => p.id === item.id);
-    const subtotal = product.price * item.qty;
-
-    total += subtotal;
-    itemCount += item.qty;
-
-    container.innerHTML += `
-      <div>
-        <strong>${product.name}</strong><br>
-        $${product.price} x ${item.qty}
-        <div>
-          <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
-          <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
-          <button onclick="removeItem(${item.id})">Remove</button>
-        </div>
-      </div>
-      <hr/>
-    `;
-  });
-
-  totalEl.textContent = total;
-  count.textContent = itemCount;
+      summary.total += product.price * cartItem.qty;
+      summary.itemCount += cartItem.qty;
+      return summary;
+    },
+    { total: INITIAL_SUMMARY_TOTAL, itemCount: INITIAL_SUMMARY_ITEM_COUNT }
+  );
 }
 
-// INIT
-renderProducts();
-renderCart();
+function createProductCardMarkup(product) {
+  return `
+    <div class="product">
+      <img
+        src="${product.image}"
+        alt="${product.name}"
+        onerror="this.src='${IMAGE_FALLBACK_URL}'"
+      />
+      <h4>${product.name}</h4>
+      <p>ksh.${product.price}</p>
+      <button onclick="addToCart(${product.id})">Add to Cart</button>
+    </div>
+  `;
+}
+
+function createCartItemMarkup(cartItem) {
+  const product = findProduct(cartItem.id);
+  if (!product) return '';
+
+  const itemTotal = product.price * cartItem.qty;
+
+  return `
+    <div class="cart-item">
+      <strong>${product.name}</strong><br>
+      ksh.${product.price} x ${cartItem.qty} = ksh.${itemTotal}
+      <div>
+        <button class="qty-btn" onclick="updateCartItemQuantity(${cartItem.id}, ${QUANTITY_DECREMENT})">-</button>
+        <button class="qty-btn" onclick="updateCartItemQuantity(${cartItem.id}, ${QUANTITY_INCREMENT})">+</button>
+        <button onclick="removeCartItem(${cartItem.id})">Remove</button>
+      </div>
+    </div>
+    <hr/>
+  `;
+}
+function renderProducts() {
+  productsContainer.innerHTML = products.map(createProductCardMarkup).join('');
+}
+
+function renderCart() {
+  cartItemsContainer.innerHTML = appState.cartItems.map(createCartItemMarkup).join('');
+
+  const cartSummary = calculateCartSummary();
+  cartCountElement.textContent = cartSummary.itemCount;
+  cartTotalElement.textContent = cartSummary.total;
+}
+
+function initApp() {
+  renderProducts();
+  renderCart();
+}
+
+initApp();
+
+
+//Basic logging
+console.log('App initialized with products:', products);
+console.log('Initial cart items:', appState.cartItems);
+console.log('Initial cart summary:', calculateCartSummary());
+// Style logging
+console.log('%cApp initialized with products:', 'color: green; font-weight: bold;', products);
+console.log('%cInitial cart items:', 'color: blue; font-weight: bold;', appState.cartItems);
+console.log('%cInitial cart summary:', 'color: purple; font-weight: bold;', calculateCartSummary());
+// Warning and errors
+console.warn('This is a warning message about cart functionality.');
+console.error('This is an error message about cart functionality.');
+
+// Tables for arrays and objects
+console.table(products);
+console.table(appState.cartItems);
+console.table(calculateCartSummary());
+
+// Grouping related logs
+console.group('Cart Summary');
+console.log('Total items in cart:', calculateCartSummary().itemCount);
+console.log('Total price of cart:', calculateCartSummary().total);
+console.groupEnd();
+
+//Timing
+console.time('Render Cart Time');
+ renderCart();
+console.timeEnd('Render Cart Time'); 
+
+//conditional logging
+if (appState.cartItems.length === 0) {
+  console.warn('Cart is currently empty.');
+}
+console.assert(appState.cartItems.length >= 0, 'Cart items should be an array');
+console.assert(typeof calculateCartSummary().total === 'number', 'Cart total should be a number');
+
+// eslint-disable-next-line no-unused-vars
+function logCartUpdate() {
+  console.trace('Cart updated');
+}

@@ -306,3 +306,4 @@ window.addEventListener('load', () => {
     render();
     noteTitle.focus();
 });
+
