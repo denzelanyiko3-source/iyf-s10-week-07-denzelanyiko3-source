@@ -8,6 +8,8 @@
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
     "format": "prettier --write ."
+    ,
+    "dev": "npx serve ."
   },
   "repository": {
     "type": "git",
